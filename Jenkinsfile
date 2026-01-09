@@ -1,14 +1,27 @@
 pipeline {
     agent any
+    environment {
+        IMAGE_NAME = "devops-production-website"
+        IMAGE_TAG  = "${BUILD_NUMBER}"
+    }
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                echo "GitHub code checkout successful"
+                checkout scm
             }
         }
-        stage('Verify Files') {
+
+        stage('Build Docker Image') {
             steps {
-                sh 'ls -l'
+                sh '''
+                  docker build -t $IMAGE_NAME:$IMAGE_TAG .
+                '''
+            }
+        }
+
+        stage('List Docker Images') {
+            steps {
+                sh 'docker images | grep $IMAGE_NAME'
             }
         }
     }
